@@ -1,13 +1,16 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
 
-#define candidadateMAX 9
-#define voterMAX 15
+#define MAX_CANDIDATES 9
+#define MAX_VOTERS 15
+#define MAX_NAME_LENGTH 30
 
-int voting (char *candidates[], int candidatesCount, int votersCount);
+char **voting(char *candidates[], int candidatesCount, int votersCount);
+int voteCounting(char **votes, int votersCount, char *candidates[], int candidatesCount);
 
-int main (int argc, char argv[]) {
+int main(int argc, char *argv[]) {
     int candidatesCount = argc - 1;
     int votersCount = 0;
 
@@ -16,52 +19,85 @@ int main (int argc, char argv[]) {
         return 2;
     }
 
-    if (candidatesCount > candidadateMAX) {
-        printf("Maximum number of candidates is %i\n.", candidadateMAX);
+    if (candidatesCount > MAX_CANDIDATES) {
+        printf("Maximum number of candidates is %i\n.", MAX_CANDIDATES);
         return 2;
     }
 
     printf("Number of voters: ");
-    while (scanf("%d",&votersCount) != 1 || votersCount <= 1 || votersCount > voterMAX) {
-        printf("Invalid input. Please enter a valid number of voters: ");
+    while (scanf("%d",&votersCount) != 1 || votersCount <= 1 || votersCount > MAX_VOTERS) {
+        printf("Invalid input.\nPlease enter a valid number of voters: ");
         while (getchar () != '\n');
     }
+    
+    char *candidates[99];
 
-    // do {
-    //     printf("Number of voters: ");
-    //     scanf("%d", &votersCount); //Entender melhor depois.
-    //     printf("Voters count: %d", votersCount);
-    //     while (getchar () != '\n');
-    // } while (!isdigit(votersCount) || votersCount <= 1 || votersCount > voterMAX);
+    for (int i = 0; i < candidatesCount; i++) {
+        candidates[i] = argv[i + 1];
+    }
 
-    voting(argv, candidatesCount, votersCount);
+    char **votes = voting(candidates, candidatesCount, votersCount);
+
+    if (votes == NULL) {
+        return 1;
+    }
+
+    voteCounting(votes, votersCount, candidates, candidatesCount);
+
+    for (int i = 0; i < votersCount; i++) {
+        free(votes[i]);
+    }
+    free(votes);
 
     return 0;
 }
 
-int voting (char *candidates[], int candidatesCount, int votersCount) {
-    // ----------------------------------------------------------------
-    //TO:DO Arrumar ponteiros e forma como voting está recebendo a argv
-    // ----------------------------------------------------------------
-    char *votes[99];
+char **voting(char *candidates[], int candidatesCount, int votersCount) {
+    char **votes = malloc(votersCount * sizeof(char *)); //[MAX_VOTERS];
 
-    //Uma outra ideia seria implementar hash, e aí eu poderia consultar diretamente o nome do candidato na tabela, facilitando a lógica e aumentando performance.
     for (int i = 0; i < votersCount; i++) {
-        printf("Eleitor %d. Voto: ", i + 1);
-        scanf("%s", &votes[i]);
-
-        for (int j = 0, h = 1; j < candidatesCount; j++, h++) {
-            int compare = strcmp(votes[i], candidates[h]);
-
-            if (compare == 0) {
-                printf("Valid vote.\n");
-                break;
-            }
-
-            if (j = candidatesCount) {
-                printf("Invalid vote.");
-                return 1;
-            }
+        votes[i] = malloc(MAX_NAME_LENGTH * sizeof(char));
+        if (votes[i] == NULL) {
+            printf("Memory allocation failed!\n");
+            return NULL;
         }
     }
+
+    for (int i = 0; i < votersCount; i++) {
+        printf("Eleitor %d. Voto: ", i + 1);
+        scanf("%s", votes[i]);
+
+        int validVote = 0;
+
+        for (int j = 0; j < candidatesCount; j++) {
+            if (strcmp(votes[i], candidates[j]) == 0) {
+                printf("Valid vote.\n");
+                validVote = 1;
+                break;
+            }
+        }
+
+        if (!validVote) {
+            printf("Invalid vote. Stopping the program.\n");
+            return NULL;
+        }
+    }
+
+    return votes;
+}
+
+int voteCounting(char **votes, int votersCount, char *candidates[], int candidatesCount) {
+    char *votesCounted[99];
+
+    for (int i = 0; i < candidatesCount; i++) {
+        for (int j = 0; j < votersCount; j++) {
+            printf("%s", votes[j]);
+
+            if (strcmp(votes[j], candidates[i]) == 0) {
+                votesCounted;
+            } 
+        }
+    }
+
+    return 0;
 }
