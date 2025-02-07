@@ -87,17 +87,57 @@ char **voting(char *candidates[], int candidatesCount, int votersCount) {
 }
 
 int voteCounting(char **votes, int votersCount, char *candidates[], int candidatesCount) {
-    char *votesCounted[99];
+    int frequency;
+    char result[30][MAX_NAME_LENGTH];
+    int resultCount = 0;
 
-    for (int i = 0; i < candidatesCount; i++) {
-        for (int j = 0; j < votersCount; j++) {
-            printf("%s", votes[j]);
+    for(int i = 0; i < candidatesCount; i++) {
+        int count = 0;
+
+        for(int j = 0; j < votersCount; j++) {
+            //printf("%s", votes[j]);
 
             if (strcmp(votes[j], candidates[i]) == 0) {
-                votesCounted;
-            } 
+                count++;
+            }
+        }
+
+        if(count > frequency) {
+            frequency = count;
+            resultCount = 0;
+            strcpy(result[resultCount], candidates[i]);
+            resultCount++;
+        } else if(count == frequency) {
+            int isDuplicate = 0;
+            for (int k = 0; k < resultCount; k++) {
+                if (strcmp(result[k], candidates[i]) == 0) {
+                    isDuplicate = 1;
+                    break;
+                }
+            }
+
+            if(!isDuplicate) {
+                strcpy(result[resultCount], candidates[i]);
+                resultCount++;
+            }
         }
     }
+
+    if (resultCount > 1) {
+        printf("Os candidatos com mais votos foram: ");
+        for (int i = 0; i < resultCount; i++) {
+            printf("%s ", result[i]);
+        }
+        printf("\nEles receberam %d votos.", frequency);
+
+        return 0;
+    }
+
+    printf("O candidato que ganhou foi o ");
+    for (int i = 0; i < resultCount; i++) {
+        printf("%s ", result[i]);
+    }
+    printf("\nEle recebeu %d votos.", frequency);
 
     return 0;
 }
